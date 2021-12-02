@@ -3,8 +3,9 @@ import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider as PaperProvider } from "react-native-paper";
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
-import store from "./store/index";
+import store, { persistor } from "./store/index";
 import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
@@ -18,12 +19,14 @@ export default function App() {
   } else {
     return (
       <Provider store={store}>
-        <PaperProvider>
-          <SafeAreaProvider>
-            <Navigation colorScheme={colorScheme} />
-            {/* <StatusBar /> */}
-          </SafeAreaProvider>
-        </PaperProvider>
+        <PersistGate persistor={persistor}>
+          <PaperProvider>
+            <SafeAreaProvider>
+              <Navigation colorScheme={colorScheme} />
+              {/* <StatusBar /> */}
+            </SafeAreaProvider>
+          </PaperProvider>
+        </PersistGate>
       </Provider>
     );
   }
