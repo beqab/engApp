@@ -1,7 +1,9 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { View, Text, Dimensions, ScrollView } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import { FontAwesome } from "@expo/vector-icons";
+import { useDispatch } from "react-redux";
+import { addWord } from "../store/dictionaryReducer/dictionaryActions";
 
 import { StyleSheet } from "react-native";
 
@@ -10,7 +12,24 @@ import { RootTabScreenProps } from "../types";
 let ScreenHeight = Dimensions.get("window").height;
 
 export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
-  const [text, setText] = React.useState("");
+  const [text, setText] = useState("");
+  const [word, setWord] = useState("");
+  const [pronunciation, setPronunciation] = useState("");
+  const [definition, setDefinition] = useState("");
+  const [examples, setExamples] = useState("");
+
+  const dispatch = useDispatch();
+
+  const addWordHandler = () => {
+    dispatch(
+      addWord({
+        word,
+        definition,
+        pronunciation,
+        examples,
+      })
+    );
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -21,6 +40,9 @@ export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
         style={{ ...styles.marginBottom }}
         label="Word/phrase"
         placeholder="Word/phrase"
+        onChange={(e: any) => {
+          setWord(e.target.value);
+        }}
         right={
           <TextInput.Icon
             name={() => <FontAwesome name={"search"} size={24} />}
@@ -35,6 +57,9 @@ export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
         style={{ ...styles.marginBottom }}
         label="pronunciation"
         placeholder="pronunciation"
+        onChange={(e: any) => {
+          setPronunciation(e.target.value);
+        }}
       />
       <TextInput
         multiline
@@ -46,6 +71,9 @@ export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
         }}
         label="Definition"
         placeholder="Definition"
+        onChange={(e: any) => {
+          setPronunciation(e.target.value);
+        }}
       />
       <TextInput
         multiline
@@ -57,9 +85,12 @@ export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
         }}
         label="Examples"
         placeholder="Examples"
+        onChange={(e: any) => {
+          setPronunciation(e.target.value);
+        }}
       />
 
-      <Button icon="plus" mode="contained" onPress={() => alert(ScreenHeight)}>
+      <Button icon="plus" mode="contained" onPress={addWordHandler}>
         Add word
       </Button>
     </ScrollView>

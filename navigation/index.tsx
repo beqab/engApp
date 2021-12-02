@@ -18,7 +18,7 @@ import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import ModalScreen from "../screens/ModalScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
-import TabLearn from "../screens/TabLearn";
+import TabLearn from "../screens/TabAddWord";
 import TabWords from "../screens/tabWords";
 import TabTwoScreen from "../screens/TabTwoScreen";
 import {
