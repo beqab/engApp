@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, Dimensions, ScrollView } from "react-native";
-import { TextInput, Button } from "react-native-paper";
+import { TextInput, Button, Modal, Portal } from "react-native-paper";
 import { FontAwesome } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import { addWord } from "../store/dictionaryReducer/dictionaryActions";
+import { translate } from "../services/translate/translate.http";
 
 import { StyleSheet } from "react-native";
 
@@ -17,6 +18,7 @@ export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
   const [pronunciation, setPronunciation] = useState("");
   const [definition, setDefinition] = useState("");
   const [examples, setExamples] = useState("");
+  const [openModal, setOpenModal] = useState<string | boolean>(false);
 
   const dispatch = useDispatch();
 
@@ -29,10 +31,51 @@ export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
         examples,
       })
     );
+    setExamples("");
+    setDefinition("");
+    setPronunciation("");
+    setWord("");
+  };
+
+  const translateWord = () => {
+    setOpenModal("Searching for word");
+    translate
+      .translateWord(word)
+      .then((res) => {
+        console.log(res);
+        setOpenModal(false);
+        if (res.data) {
+          setPronunciation(res.data[0].phonetic);
+        }
+        if (res.data[0]) {
+          res.data[0].meanings;
+
+          setDefinition(res.data[0].meanings[0].definitions[0].definition);
+          setExamples(res.data[0].meanings[0].definitions[0].example);
+        }
+      })
+      .catch((err) => {
+        setOpenModal("Word not Found");
+      });
   };
 
   return (
     <ScrollView style={styles.container}>
+      <Portal>
+        <Modal
+          visible={!!openModal}
+          onDismiss={() => {
+            setOpenModal(false);
+          }}
+          contentContainerStyle={{
+            backgroundColor: "white",
+            padding: 20,
+            margin: 30,
+          }}
+        >
+          <Text style={{ textAlign: "center" }}>{openModal}</Text>
+        </Modal>
+      </Portal>
       <Text> holaa </Text>
       <TextInput
         mode="outlined"
@@ -46,7 +89,7 @@ export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
         right={
           <TextInput.Icon
             name={() => <FontAwesome name={"search"} size={24} />}
-            onPress={() => alert("search")}
+            onPress={translateWord}
           />
         }
         // right={<TextInput.Icon icon="password" onPress={()=>alert('show password')}
@@ -57,6 +100,7 @@ export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
         style={{ ...styles.marginBottom }}
         label="pronunciation"
         placeholder="pronunciation"
+        value={pronunciation}
         onChange={(e: any) => {
           setPronunciation(e.target.value);
         }}
@@ -71,8 +115,9 @@ export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
         }}
         label="Definition"
         placeholder="Definition"
+        value={definition}
         onChange={(e: any) => {
-          setPronunciation(e.target.value);
+          setDefinition(e.target.value);
         }}
       />
       <TextInput
@@ -84,9 +129,10 @@ export default function TabLearn({ navigation }: RootTabScreenProps<"TabOne">) {
           ...styles.marginBottom,
         }}
         label="Examples"
+        value={examples}
         placeholder="Examples"
         onChange={(e: any) => {
-          setPronunciation(e.target.value);
+          setExamples(e.target.value);
         }}
       />
 
@@ -104,7 +150,7 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     maxHeight: ScreenHeight - 50,
     overflow: "scroll",
-    backgroundColor: "red",
+    // backgroundColor: "red",
     paddingLeft: 15,
     paddingRight: 15,
   },
